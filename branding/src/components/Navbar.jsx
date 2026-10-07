@@ -68,25 +68,72 @@ export default function Navbar({
   const handleNavClick = (href, id) => {
     setActiveTab(id);
     onCloseMobileMenu?.();
-    const target = document.querySelector(href);
-    if (target) {
-      if (window.__lenis) {
-        window.__lenis.scrollTo(target, { offset: -70, duration: 1.2 });
-      } else {
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
+
+    // Immediately release body/html scroll lock so page can scroll freely
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    if (window.__lenis) {
+      window.__lenis.start();
     }
+
+    // Defer slightly for drawer closing and layout settle
+    setTimeout(() => {
+      const target = document.querySelector(href);
+      if (!target) return;
+
+      const isMobile = window.innerWidth <= 860;
+      const targetOffset = isMobile ? -20 : -70;
+
+      if (window.__lenis) {
+        window.__lenis.start();
+        window.__lenis.scrollTo(target, {
+          offset: targetOffset,
+          duration: 1.1,
+        });
+      } else {
+        const topPos = target.getBoundingClientRect().top + window.scrollY + targetOffset;
+        window.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+      }
+
+      // Mobile touch fallback verification: ensures section is reached
+      if (isMobile) {
+        setTimeout(() => {
+          const rect = target.getBoundingClientRect();
+          if (Math.abs(rect.top - Math.abs(targetOffset)) > 90) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 220);
+      }
+    }, 60);
   };
 
   const handleLogoClick = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setActiveTab('');
     onCloseMobileMenu?.();
+
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     if (window.__lenis) {
-      window.__lenis.scrollTo(0, { duration: 1.2 });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.__lenis.start();
     }
+
+    setTimeout(() => {
+      if (window.__lenis) {
+        window.__lenis.start();
+        window.__lenis.scrollTo(0, { duration: 1.1 });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      if (window.innerWidth <= 860) {
+        setTimeout(() => {
+          if (window.scrollY > 40) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }, 220);
+      }
+    }, 60);
   };
 
   return (
@@ -202,7 +249,14 @@ export default function Navbar({
             aria-label="Navigation Menu"
           >
             <div className="mobile-drawer-header">
-              <span className="drawer-brand">SUAVE</span>
+              <a
+                href="#hero"
+                className="drawer-brand"
+                onClick={handleLogoClick}
+                aria-label="SUAVE Homepage"
+              >
+                SUAVE
+              </a>
               <button
                 className="drawer-close-btn"
                 onClick={onCloseMobileMenu}

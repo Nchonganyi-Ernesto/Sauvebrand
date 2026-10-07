@@ -354,15 +354,33 @@ export default function ProductShowcase() {
 
           {/* Right: Explore Action Button */}
           <div className="vshape-action-wrap">
-            <button
-              type="button"
+            <a
+              href="#products"
               className="vshape-explore-btn"
               aria-label={`Explore ${activeEdition.name}`}
               onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.preventDefault();
+                const target = document.querySelector('#products');
+                if (target) {
+                  const isMobile = window.innerWidth <= 860;
+                  const targetOffset = isMobile ? -20 : -70;
+                  if (window.__lenis) {
+                    window.__lenis.start();
+                    window.__lenis.scrollTo(target, {
+                      offset: targetOffset,
+                      duration: 1.1,
+                    });
+                  } else {
+                    const topPos = target.getBoundingClientRect().top + window.scrollY + targetOffset;
+                    window.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+                  }
+                }
+              }}
             >
               <span>Explore</span>
               <ArrowRight size={11} aria-hidden="true" />
-            </button>
+            </a>
           </div>
         </div>
       </div>

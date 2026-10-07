@@ -129,6 +129,35 @@ export default function Ecosystem() {
   const pumpImg = useTransparentCutout(rawPumpImg);
   const tubeImg = useTransparentCutout(rawTubeImg);
 
+  const handleExploreClick = (e) => {
+    e.preventDefault();
+    const target = document.querySelector('#products');
+    if (target) {
+      const isMobile = window.innerWidth <= 860;
+      const targetOffset = isMobile ? -20 : -70;
+
+      if (window.__lenis) {
+        window.__lenis.start();
+        window.__lenis.scrollTo(target, {
+          offset: targetOffset,
+          duration: 1.2,
+        });
+      } else {
+        const topPos = target.getBoundingClientRect().top + window.scrollY + targetOffset;
+        window.scrollTo({ top: Math.max(0, topPos), behavior: 'smooth' });
+      }
+
+      if (isMobile) {
+        setTimeout(() => {
+          const rect = target.getBoundingClientRect();
+          if (Math.abs(rect.top - Math.abs(targetOffset)) > 90) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 220);
+      }
+    }
+  };
+
   return (
     <section
       id="ecosystem"
@@ -162,14 +191,15 @@ export default function Ecosystem() {
                 <p className="eco-card-desc">
                   Cold-pressed shea butter engineered to lock in 48-hour deep moisture.
                 </p>
-                <button
-                  type="button"
+                <a
+                  href="#products"
                   className="eco-btn eco-btn-dark"
-                  aria-label="Explore Whipped Body Soufflé"
+                  onClick={handleExploreClick}
+                  aria-label="Explore The Collection - Whipped Body Soufflé"
                 >
                   <span>Explore Soufflé</span>
                   <ArrowUpRight size={13} />
-                </button>
+                </a>
               </div>
             </div>
             <div className="eco-card-visual eco-visual-wide">
@@ -194,14 +224,15 @@ export default function Ecosystem() {
                 <p className="eco-card-desc eco-desc-white">
                   Fast-absorbing citrus shield formulated for seamless daily hydration.
                 </p>
-                <button
-                  type="button"
+                <a
+                  href="#products"
                   className="eco-btn eco-btn-light"
-                  aria-label="Explore Active Hydrating Lotion"
+                  onClick={handleExploreClick}
+                  aria-label="Explore The Collection - Active Hydrating Lotion"
                 >
                   <span>Explore Lotion</span>
                   <ArrowUpRight size={13} />
-                </button>
+                </a>
               </div>
             </div>
             <div className="eco-card-visual eco-visual-pump">
@@ -226,14 +257,15 @@ export default function Ecosystem() {
                 <p className="eco-card-desc">
                   Colloidal oat and squalane engineered for instant on-the-go barrier care.
                 </p>
-                <button
-                  type="button"
+                <a
+                  href="#products"
                   className="eco-btn eco-btn-dark"
-                  aria-label="Explore Precision Hand Cream"
+                  onClick={handleExploreClick}
+                  aria-label="Explore The Collection - Precision Hand Cream"
                 >
                   <span>Explore Cream</span>
                   <ArrowUpRight size={13} />
-                </button>
+                </a>
               </div>
             </div>
             <div className="eco-card-visual eco-visual-tube">
