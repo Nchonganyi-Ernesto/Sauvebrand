@@ -99,7 +99,7 @@ export default function App() {
   return (
     <div className="suave-campaign-app">
       {/* Floating Header Navigation (Brand left, Pill Dock center, Cart right with reactive count) */}
-      <Navbar cartCount={cartCount} onOpenCart={() => setIsCartOpen(true)} />
+      <Navbar cartCount={cartCount} onOpenCart={() => setIsCartOpen((prev) => !prev)} />
 
       {/* Main Campaign Content */}
       <main id="main-content">
