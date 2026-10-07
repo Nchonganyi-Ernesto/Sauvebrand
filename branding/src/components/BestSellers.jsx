@@ -92,18 +92,6 @@ function useTransparentCutout(src) {
 
 export default function BestSellers({ onAddToCart }) {
   const [addedItem, setAddedItem] = useState(null);
-  const [activeCardId, setActiveCardId] = useState(null);
-
-  // Close active card on mobile when tapping outside
-  useEffect(() => {
-    const handleOutsidePointer = (e) => {
-      if (!e.target.closest('.product-card')) {
-        setActiveCardId(null);
-      }
-    };
-    document.addEventListener('pointerdown', handleOutsidePointer);
-    return () => document.removeEventListener('pointerdown', handleOutsidePointer);
-  }, []);
 
   // Automatically extracts transparent cutout of the first image
   const peachCutout = useTransparentCutout(rawPeachImg);
@@ -188,13 +176,10 @@ export default function BestSellers({ onAddToCart }) {
       <div className="bestsellers-grid">
         {products.map((product) => {
           const isAdded = addedItem === product.id;
-          const isActive = activeCardId === product.id;
           return (
             <article
               key={product.id}
-              className={`product-card ${isActive ? 'is-active' : ''}`}
-              onClick={() => setActiveCardId((prev) => (prev === product.id ? null : product.id))}
-              tabIndex={0}
+              className="product-card"
               role="region"
               aria-label={product.name}
             >

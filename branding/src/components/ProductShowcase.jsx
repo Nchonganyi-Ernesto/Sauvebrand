@@ -90,6 +90,16 @@ export default function ProductShowcase() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dragOffset, setDragOffset] = useState(0); // Normalized drag offset in index units
   const [isDragging, setIsDragging] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 860);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const stageRef = useRef(null);
   const dragStartRef = useRef({ x: 0, y: 0, time: 0 });
@@ -258,10 +268,11 @@ export default function ProductShowcase() {
             // y: V-shape curve where center (diff=0) is lowest, left & right rise upwards
             // scale: center item is large (1.15), side items shrink to ~0.74
             // opacity: center item is 100%, side items fade to 45%
-            const stepX = 430;
+            const stepX = isMobile ? 255 : 430;
             const posX = diff * stepX;
-            const posY = -Math.pow(Math.abs(diff), 1.15) * 70; // THE V-SHAPE LIFT
-            const scale = Math.max(0.76, 1.45 - Math.abs(diff) * 0.52);
+            const posY = -Math.pow(Math.abs(diff), 1.15) * (isMobile ? 48 : 70); // THE V-SHAPE LIFT
+            const maxScale = isMobile ? 1.2 : 1.45;
+            const scale = Math.max(0.74, maxScale - Math.abs(diff) * (isMobile ? 0.42 : 0.52));
             const opacity = Math.max(0, 1 - Math.abs(diff) * 0.52);
             const brightness = Math.max(0.48, 1 - Math.abs(diff) * 0.45);
             const zIndex = Math.round(10 - Math.abs(diff) * 6);
@@ -298,7 +309,13 @@ export default function ProductShowcase() {
         {/* Bottom Control Dock: Thumbnails (Left), Description (Center), Explore (Right) */}
         <div className="vshape-bottom-bar">
           {/* Left: Thumbnail Edition Selector */}
-          <div className="vshape-thumbnails" role="tablist" aria-label="Select edition">
+          <div
+            className="vshape-thumbnails"
+            role="tablist"
+            aria-label="Select edition"
+            onPointerDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+          >
             {editions.map((edition, idx) => {
               const isActive = idx === currentIndex;
               return (
@@ -309,7 +326,13 @@ export default function ProductShowcase() {
                   aria-selected={isActive}
                   aria-label={`Select ${edition.name}`}
                   className={`vshape-thumb-btn ${isActive ? 'is-active' : ''}`}
-                  onClick={() => setCurrentIndex(idx)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDragOffset(0);
+                    setCurrentIndex(idx);
+                  }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
                 >
                   <img
                     src={edition.image}
@@ -335,6 +358,7 @@ export default function ProductShowcase() {
               type="button"
               className="vshape-explore-btn"
               aria-label={`Explore ${activeEdition.name}`}
+              onPointerDown={(e) => e.stopPropagation()}
             >
               <span>Explore</span>
               <ArrowRight size={11} aria-hidden="true" />
