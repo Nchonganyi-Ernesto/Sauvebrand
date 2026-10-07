@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Sparkles, X } from 'lucide-react';
 
-export default function Navbar({ cartCount = 0, onOpenCart }) {
+export default function Navbar({
+  cartCount = 0,
+  onOpenCart,
+  isMobileMenuOpen = false,
+  onToggleMobileMenu,
+  onCloseMobileMenu,
+}) {
   const [activeTab, setActiveTab] = useState('');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const navItems = [
@@ -60,21 +65,9 @@ export default function Navbar({ cartCount = 0, onOpenCart }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Prevent background scrolling when mobile menu drawer is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileMenuOpen]);
-
   const handleNavClick = (href, id) => {
     setActiveTab(id);
-    setIsMobileMenuOpen(false);
+    onCloseMobileMenu?.();
     const target = document.querySelector(href);
     if (target) {
       if (window.__lenis) {
@@ -88,7 +81,7 @@ export default function Navbar({ cartCount = 0, onOpenCart }) {
   const handleLogoClick = (e) => {
     e.preventDefault();
     setActiveTab('');
-    setIsMobileMenuOpen(false);
+    onCloseMobileMenu?.();
     if (window.__lenis) {
       window.__lenis.scrollTo(0, { duration: 1.2 });
     } else {
@@ -170,7 +163,7 @@ export default function Navbar({ cartCount = 0, onOpenCart }) {
             className="mobile-menu-trigger"
             aria-label={isMobileMenuOpen ? 'Close Menu' : 'Open Menu'}
             aria-expanded={isMobileMenuOpen}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={onToggleMobileMenu}
           >
             {isMobileMenuOpen ? (
               <X className="mobile-close-icon" size={17} />
@@ -199,7 +192,7 @@ export default function Navbar({ cartCount = 0, onOpenCart }) {
       {isMobileMenuOpen && (
         <div
           className="mobile-drawer-backdrop"
-          onClick={() => setIsMobileMenuOpen(false)}
+          onClick={onCloseMobileMenu}
         >
           <div
             className="mobile-drawer-card"
@@ -212,7 +205,7 @@ export default function Navbar({ cartCount = 0, onOpenCart }) {
               <span className="drawer-brand">SUAVE</span>
               <button
                 className="drawer-close-btn"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={onCloseMobileMenu}
                 aria-label="Close menu"
               >
                 <X size={19} />

@@ -126,15 +126,27 @@ export default function Cart({
   onUpdateQuantity,
   onRemoveItem,
 }) {
-  // Lock body scroll when cart is open
+  // Lock body & Lenis scroll when cart is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      if (window.__lenis) {
+        window.__lenis.stop();
+      }
     } else {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      if (window.__lenis) {
+        window.__lenis.start();
+      }
     }
     return () => {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      if (window.__lenis) {
+        window.__lenis.start();
+      }
     };
   }, [isOpen]);
 
@@ -243,38 +255,41 @@ export default function Cart({
                   <div className="cart-item-info">
                     <span className="cart-item-edition">{item.editionName || 'LIMITED EDITION'}</span>
                     <h4 className="cart-item-name">{item.name}</h4>
-                    <p className="cart-item-price">${(item.price * item.quantity).toFixed(2)}</p>
 
-                    {/* Quantity & Remove Controls */}
-                    <div className="cart-item-controls">
-                      <div className="cart-qty-pill">
+                    <div className="cart-item-meta-row">
+                      <p className="cart-item-price">${(item.price * item.quantity).toFixed(2)}</p>
+
+                      {/* Quantity & Remove Controls */}
+                      <div className="cart-item-controls">
+                        <div className="cart-qty-pill">
+                          <button
+                            type="button"
+                            className="cart-qty-btn"
+                            onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                            aria-label="Decrease quantity"
+                          >
+                            <MinusIcon size={12} />
+                          </button>
+                          <span className="cart-qty-val">{item.quantity}</span>
+                          <button
+                            type="button"
+                            className="cart-qty-btn"
+                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                            aria-label="Increase quantity"
+                          >
+                            <PlusIcon size={12} />
+                          </button>
+                        </div>
+
                         <button
                           type="button"
-                          className="cart-qty-btn"
-                          onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                          aria-label="Decrease quantity"
+                          className="cart-remove-btn"
+                          onClick={() => onRemoveItem(item.id)}
+                          aria-label={`Remove ${item.name}`}
                         >
-                          <MinusIcon size={12} />
-                        </button>
-                        <span className="cart-qty-val">{item.quantity}</span>
-                        <button
-                          type="button"
-                          className="cart-qty-btn"
-                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                          aria-label="Increase quantity"
-                        >
-                          <PlusIcon size={12} />
+                          <TrashIcon size={13} />
                         </button>
                       </div>
-
-                      <button
-                        type="button"
-                        className="cart-remove-btn"
-                        onClick={() => onRemoveItem(item.id)}
-                        aria-label={`Remove ${item.name}`}
-                      >
-                        <TrashIcon size={13} />
-                      </button>
                     </div>
                   </div>
                 </div>

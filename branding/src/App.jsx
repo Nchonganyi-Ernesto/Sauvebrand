@@ -18,6 +18,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [cartItems, setCartItems] = useState([
     {
       id: 'peach',
@@ -60,8 +61,54 @@ export default function App() {
     };
   }, []);
 
+  // Prevent background page scrolling when cart or mobile menu drawer is open
+  useEffect(() => {
+    const isLocked = isCartOpen || isMobileMenuOpen;
+    if (isLocked) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      if (window.__lenis) {
+        window.__lenis.stop();
+      }
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      if (window.__lenis) {
+        window.__lenis.start();
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      if (window.__lenis) {
+        window.__lenis.start();
+      }
+    };
+  }, [isCartOpen, isMobileMenuOpen]);
+
+  // Mutually exclusive toggle/open handlers: never allow both drawers open simultaneously
+  const handleToggleCart = () => {
+    setIsMobileMenuOpen(false);
+    setIsCartOpen((prev) => !prev);
+  };
+
+  const handleCloseCart = () => {
+    setIsCartOpen(false);
+  };
+
+  const handleToggleMobileMenu = () => {
+    setIsCartOpen(false);
+    setIsMobileMenuOpen((prev) => !prev);
+  };
+
+  const handleCloseMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   const handleAddToCart = (product) => {
     if (!product) return;
+    setIsMobileMenuOpen(false); // Close mobile menu if open
     setCartItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
@@ -99,7 +146,13 @@ export default function App() {
   return (
     <div className="suave-campaign-app">
       {/* Floating Header Navigation (Brand left, Pill Dock center, Cart right with reactive count) */}
-      <Navbar cartCount={cartCount} onOpenCart={() => setIsCartOpen((prev) => !prev)} />
+      <Navbar
+        cartCount={cartCount}
+        onOpenCart={handleToggleCart}
+        isMobileMenuOpen={isMobileMenuOpen}
+        onToggleMobileMenu={handleToggleMobileMenu}
+        onCloseMobileMenu={handleCloseMobileMenu}
+      />
 
       {/* Main Campaign Content */}
       <main id="main-content">
