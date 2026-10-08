@@ -1391,12 +1391,6 @@ html, body {
   border-radius: 36px;
   overflow: hidden;
   box-sizing: border-box;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
-}
-
-.eco-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
 }
 
 .eco-card-content {
@@ -1528,11 +1522,6 @@ html, body {
   display: block;
   user-select: none;
   -webkit-user-drag: none;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.eco-card:hover .eco-product-img {
-  transform: translateY(-8px) scale(1.02);
 }
 
 /* Specific Card Themes */
